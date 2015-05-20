@@ -96,8 +96,9 @@ Events will be sent to the specified Event Handler class when one is received.
 
 The following information will be sent with each Event:
 
-<b>Discovery</b>: NONE
-<b>LOST</b>: NONE
-<b>BUTTON_PRESS_EVENT</b>: "button" wil hold an integer value specifying the button that was pressed
+<p><b>CONNECTED</b>: NONE</p>
+<p><b>DISCONNECTED</b>: NONE</p>
+<p><b>BUTTON_PRESS_EVENT</b>: "button" wil hold an integer value specifying the button that was pressed</p>
+<p></p>
 *NOTE: You will only receive the BUTTON_PRESS_EVENT if a button is configured as NOTIFY
 
