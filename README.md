@@ -25,7 +25,17 @@ private class GoGloveHandlerExtension extends Handler {
     @Override
     public void handleMessage(Message msg) {
         int type = msg.getData().getInt("BLEEventType", -1);
-        //handle event
+        switch (type) {
+            case GoGloveMessageType.CONNECTED:
+                //Handle when a GoGlove is connected to the device
+                break;
+            case GoGloveMessageType.DISCONNECTED:
+                //Handle when a GoGlove is disconnected from the device
+                break;
+            case GoGloveMessageType.BUTTON_PRESS_EVENT:
+                //Handle when a a button in the NOTIFY state is pressed
+                break;
+        }
     }
 }
 ```
@@ -54,8 +64,8 @@ public enum GoGloveActions {
 The following is the structure for event types that go to/from the GoGlove service
 ```Java
 public enum GoGloveMessageType {
-    DISCOVERY, //Event sent when a GoGlove is connected
-    LOST, //Event sent when a GoGlove is disconnected
+    CONNECTED, //Event sent when a GoGlove is connected
+    DISCONNECTED, //Event sent when a GoGlove is disconnected
     BUTTON_PRESS_EVENT, //Event sent when a button is pressed on a connected GoGlove
     BUTTON_CONFIGURATION //Event that can be sent to GoGlove to change the button configuration
 }
@@ -86,7 +96,8 @@ Events will be sent to the specified Event Handler class when one is received.
 
 The following information will be sent with each Event:
 
-###Discovery: NONE
-###LOST: NONE
-##BUTTON_PRESS_EVENT: "button" wil hold an integer value specifying the button that was pressed
+<b>Discovery</b>: NONE
+<b>LOST</b>: NONE
+<b>BUTTON_PRESS_EVENT</b>: "button" wil hold an integer value specifying the button that was pressed
 *NOTE: You will only receive the BUTTON_PRESS_EVENT if a button is configured as NOTIFY
+
