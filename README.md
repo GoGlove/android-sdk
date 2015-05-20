@@ -20,22 +20,73 @@ private ServiceManager sManager;
 
 You must also define a handler class, this class will receive messages and events from the GoGlove service such as when a GoGlove attaches or when the user presses a specific key.
 ```Java
-private class HandlerExtension extends Handler {
+private class GoGloveHandlerExtension extends Handler {
 
-		@Override
-		public void handleMessage(Message msg) {
-			int type = msg.getData().getInt("BLEEventType", -1);
-			//handle event
-		}
-	}
+    @Override
+    public void handleMessage(Message msg) {
+        int type = msg.getData().getInt("BLEEventType", -1);
+        //handle event
+    }
+}
 ```
 
 Next, you must instantiate and start a GoGlove service instance:
 ```Java
-this.sManager = new ServiceManager(this, GoGloveSDK.class, new HandlerExtension());
+this.sManager = new ServiceManager(this, GoGloveService.class, new HandlerExtension());
 ```
 
 The service is now started.
 
+###Actions
+The following actions are allowed for each button of GoGlove
+```Java
+public enum GoGloveActions {
+    PLAY_PAUSE, //Will send the HID Play/Paude media key
+    NEXT_TRACK, //Will send the Next Track media key
+    PREVIOUS_TRACK, //Will send the Previous Track media key
+    VOLUME_UP, //Will send the Volume Up media key
+    VOLUME_DOWN, //Will send the Volume Down media key
+    NOTIFY //Will only send the event to the registered Handler, will not send any media key
+}
+```
 
+###Messages
+The following is the structure for event types that go to/from the GoGlove service
+```Java
+public enum GoGloveMessageType {
+    DISCOVERY, //Event sent when a GoGlove is connected
+    LOST, //Event sent when a GoGlove is disconnected
+    BUTTON_PRESS_EVENT, //Event sent when a button is pressed on a connected GoGlove
+    BUTTON_CONFIGURATION //Event that can be sent to GoGlove to change the button configuration
+}
+```
 
+Messages will be received from GoGlove in the specified Handler class
+
+To send a message, you can call the following:
+```Java
+Message msg = new Message();
+Bundle b = new Bundle();
+b.putInt("type", GoGloveMessageType.BUTTON_CONFIGURATION);
+b.putInt("button", 1);
+b.putInt("action", GoGloveActions.PLAY_PAUSE);
+msg.setData(b);
+try {
+    sManager.send(msg);
+} catch (RemoteException e) {
+    // Handle error appropriately
+    e.printStackTrace();
+}
+```
+
+This will send a message to GoGlove to set the button configuration for the first button to send the Play/Pause command when it is pressed
+
+###Events
+Events will be sent to the specified Event Handler class when one is received.
+
+The following information will be sent with each Event:
+
+###Discovery: NONE
+###LOST: NONE
+##BUTTON_PRESS_EVENT: "button" wil hold an integer value specifying the button that was pressed
+*NOTE: You will only receive the BUTTON_PRESS_EVENT if a button is configured as NOTIFY
