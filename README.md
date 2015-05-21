@@ -34,6 +34,7 @@ private class GoGloveHandlerExtension extends Handler {
                 break;
             case GoGloveMessageType.BUTTON_PRESS_EVENT:
                 //Handle when a a button in the NOTIFY state is pressed
+                int button = msg.getData().getInt("button");
                 break;
         }
     }
@@ -56,7 +57,24 @@ public enum GoGloveActions {
     PREVIOUS_TRACK, //Will send the Previous Track media key
     VOLUME_UP, //Will send the Volume Up media key
     VOLUME_DOWN, //Will send the Volume Down media key
+    ACTIVATE, //Will activate the glove so commands can be entered
     NOTIFY //Will only send the event to the registered Handler, will not send any media key
+}
+```
+
+Any action can be applied to any button, either on the remote or on the glove itself. The list of buttons available are:
+```Java
+public enum GoGloveButtons {
+    GLOVE_INDEX_FINGER_TIP,
+    GLOVE_MIDDLE_FINGER_TIP,
+    GLOVE_RING_FINGER_TIP,
+    GLOVE_PINKY_FINGER_TIP,
+    GLOVE_INDEX_FINGER_BASE,
+    REMOTE_ONE,
+    REMOTE_TWO,
+    REMOTE_THREE,
+    REMOTE_FOUR,
+    REMOTE_FIVE,
 }
 ```
 
@@ -67,7 +85,8 @@ public enum GoGloveMessageType {
     CONNECTED, //Event sent when a GoGlove is connected
     DISCONNECTED, //Event sent when a GoGlove is disconnected
     BUTTON_PRESS_EVENT, //Event sent when a button is pressed on a connected GoGlove
-    BUTTON_CONFIGURATION //Event that can be sent to GoGlove to change the button configuration
+    BUTTON_CONFIGURATION, //Event that can be sent to GoGlove to change the button configuration
+    ACTIVATION_CONFIGURATION //Event that can be sent to GoGlove to change the activation timeout
 }
 ```
 
@@ -78,7 +97,7 @@ To send a message, you can call the following:
 Message msg = new Message();
 Bundle b = new Bundle();
 b.putInt("type", GoGloveMessageType.BUTTON_CONFIGURATION);
-b.putInt("button", 1);
+b.putInt("button", GoGloveButtons.GLOVE_INDEX_FINGER_TIP);
 b.putInt("action", GoGloveActions.PLAY_PAUSE);
 msg.setData(b);
 try {
@@ -94,11 +113,26 @@ This will send a message to GoGlove to set the button configuration for the firs
 ###Events
 Events will be sent to the specified Event Handler class when one is received.
 
-The following information will be sent with each Event:
+The following information will be sent with each Event from GoGlove:
 
 <p><b>CONNECTED</b>: NONE</p>
 <p><b>DISCONNECTED</b>: NONE</p>
 <p><b>BUTTON_PRESS_EVENT</b>: "button" wil hold an integer value specifying the button that was pressed</p>
 <p></p>
 *NOTE: You will only receive the BUTTON_PRESS_EVENT if a button is configured as NOTIFY
+
+When sending en event to GoGlove, the "type" must always be specified. The following information must be also be provided for each Event sent to GoGlove:
+
+<p><b>BUTTON_CONFIGURATION</b>:
+ <ul>
+ <li>"button": one of the values from GoGloveButtons</li>
+ <li>"action": one of the actions from GoGloveActions</li>
+ </ul>
+</p>
+<p><b>ACTIVATION_CONFIGURATION</b>:
+ <ul>
+ <li>"time": the time, in seconds, the activation will wait for inputs before deactivating</li>
+ </ul>
+</p>
+<p></p>
 
