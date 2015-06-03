@@ -13,40 +13,29 @@ These libraries should be added to your app "as-is", then they can be used as be
 ###Service
 To use the GoGlove SDK, the first step is to start the service. To do this, you must first define a ServiceManager instance.
 ```Java
-import com.goglove.sdk;
+import com.etu.GoGloveSDK.BLEDeviceInfoList;
+import com.etu.GoGloveSDK.GloveSDK;
 
-private ServiceManager sManager;
+private GloveSDK goglove;
 ```
 
-You must also define a handler class, this class will receive messages and events from the GoGlove service such as when a GoGlove attaches or when the user presses a specific key.
+If you wish to receive events from GoGlove, you must make your main class implement java.util.Observer by declaring it as
 ```Java
-private class GoGloveHandlerExtension extends Handler {
+public class MyMainActivity extends Activity implements Observer {
+```
 
-    @Override
-    public void handleMessage(Message msg) {
-        int type = msg.getData().getInt("BLEEventType", -1);
-        switch (type) {
-            case GoGloveMessageType.CONNECTED:
-                //Handle when a GoGlove is connected to the device
-                break;
-            case GoGloveMessageType.DISCONNECTED:
-                //Handle when a GoGlove is disconnected from the device
-                break;
-            case GoGloveMessageType.BUTTON_PRESS_EVENT:
-                //Handle when a a button in the NOTIFY state is pressed
-                int button = msg.getData().getInt("button");
-                break;
-        }
-    }
+Next, you must implement the necessary class to handle getting updates from GoGloveSDK
+```Java
+@Override
+public void update(Observable observable, Object data) {
+
 }
 ```
 
-Next, you must instantiate and start a GoGlove service instance:
+You can now declare a new GoGloveSDK when you wish to start using the functions:
 ```Java
-this.sManager = new ServiceManager(this, GoGloveService.class, new HandlerExtension());
+goglove = new GloveSDK(this);
 ```
-
-The service is now started.
 
 ###Actions
 The following actions are allowed for each button of GoGlove
@@ -61,7 +50,7 @@ public enum GoGloveActions {
     NOTIFY //Will only send the event to the registered Handler, will not send any media key
 }
 ```
-
+###Buttons
 Any action can be applied to any button, either on the remote or on the glove itself. The list of buttons available are:
 ```Java
 public enum GoGloveButtons {
@@ -79,7 +68,7 @@ public enum GoGloveButtons {
 ```
 
 ###Messages
-The following is the structure for event types that go to/from the GoGlove service
+The following is the structure for event types that come from GoGlove
 ```Java
 public enum GoGloveMessageType {
     CONNECTED, //Event sent when a GoGlove is connected
@@ -90,49 +79,61 @@ public enum GoGloveMessageType {
 }
 ```
 
-Messages will be received from GoGlove in the specified Handler class
-
-To send a message, you can call the following:
+###Functions
+The following functions are available to connect to and control a GoGlove:
 ```Java
-Message msg = new Message();
-Bundle b = new Bundle();
-b.putInt("type", GoGloveMessageType.BUTTON_CONFIGURATION);
-b.putInt("button", GoGloveButtons.GLOVE_INDEX_FINGER_TIP);
-b.putInt("action", GoGloveActions.PLAY_PAUSE);
-msg.setData(b);
-try {
-    sManager.send(msg);
-} catch (RemoteException e) {
-    // Handle error appropriately
-    e.printStackTrace();
-}
+    //! GloveSDK Constructor
+    /*!
+      Starts a background service that allows you to control and list attached GoGloves
+    */
+	public GloveSDK(Context context);
+
+	//! Unbind
+    /*!
+      This function unbinds the activity from the underlying service. Must be called when you leave any Activity that as called the constructor
+    */
+	public void unbind();
+
+	//! Stop
+    /*!
+      This function stops the underlying service. Should be called when you wich the application to exit and GoGLove service to end
+    */
+	public void stop();
+
+	//! BLE Device Info List
+    /*!
+      Returns a list of all BLE Devices attached
+    */
+	public BLEDeviceInfoList getConnectedDevices;
+
+	//! Connect
+    /*!
+      Connects to a specific BLE device by the DeviceInfo class
+    */
+	public void connect(BLEDeviceInfo device);
+
+	//! Connect
+    /*!
+      Connects to a specific BLE device by MAC address
+    */
+	public void connect(String address);
+
+	//! Disconnect
+    /*!
+      Disconnects from any connected GoGlove
+    */
+	public void disconnect();
+
+	//! Configure Button
+    /*!
+      Allows you to specify the action for one button
+    */
+	public void configureButton(GoGloveButtons button, GoGloveAction action);
+
+	//! Configure Activation Timeout
+    /*!
+      Configures how long the activation timer will last
+    */
+	public void configureActivationTimeout(int timeoutSeconds);
 ```
-
-This will send a message to GoGlove to set the button configuration for the first button to send the Play/Pause command when it is pressed
-
-###Events
-Events will be sent to the specified Event Handler class when one is received.
-
-The following information will be sent with each Event from GoGlove:
-
-<p><b>CONNECTED</b>: NONE</p>
-<p><b>DISCONNECTED</b>: NONE</p>
-<p><b>BUTTON_PRESS_EVENT</b>: "button" wil hold an integer value specifying the button that was pressed</p>
-<p></p>
-*NOTE: You will only receive the BUTTON_PRESS_EVENT if a button is configured as NOTIFY
-
-When sending en event to GoGlove, the "type" must always be specified. The following information must be also be provided for each Event sent to GoGlove:
-
-<p><b>BUTTON_CONFIGURATION</b>:
- <ul>
- <li>"button": one of the values from GoGloveButtons</li>
- <li>"action": one of the actions from GoGloveActions</li>
- </ul>
-</p>
-<p><b>ACTIVATION_CONFIGURATION</b>:
- <ul>
- <li>"time": the time, in seconds, the activation will wait for inputs before deactivating</li>
- </ul>
-</p>
-<p></p>
 
