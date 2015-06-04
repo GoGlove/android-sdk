@@ -63,10 +63,7 @@ public class GloveService extends AbstractService implements Observer {
 		audio = (AudioManager)getSystemService(GetContext().AUDIO_SERVICE); 
 		
 		//init the Particle service for cloud access. this also runs as a thread to get data from the cloud
-		particleSocket =  new ParticleCloudInterface();
-		particleSocket.addObserver(this);
-		Thread scannerThread = new Thread(particleSocket);
-		scannerThread.start();
+		particleSocket =  new ParticleCloudInterface();		
 	}
 
 	@Override
@@ -93,7 +90,10 @@ public class GloveService extends AbstractService implements Observer {
 					}
 					Log.d(TAG, "We are now connected and initialized!");				
 					Thread.sleep(2000);
-	
+					
+					particleSocket.addObserver(this);
+					Thread scannerThread = new Thread(particleSocket);
+					scannerThread.start();
 					particleSocket.Connect();
 					break;
 				case DISCONNECT:

@@ -75,10 +75,31 @@ public class ParticleCloudInterface extends Observable implements Runnable {
 		String params = "";
 		new Retrievedata().execute(params);
 	}
-	public void Disconnect() throws UnknownHostException, IOException {
-		inputStream.close();
-		outputStream.close();
-		socket.close();		
+	public void Disconnect() {
+		if (inputStream != null) {
+			try {
+				inputStream.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		if (outputStream != null) {
+			try {
+				outputStream.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		if (socket != null) {
+			try {
+				socket.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 	public void HandleData(byte[] data) 
 	{
@@ -172,24 +193,7 @@ public class ParticleCloudInterface extends Observable implements Runnable {
 		}
 	}
 	public void stop() {
-		shouldRun = false;
-		try {
-			inputStream.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			outputStream.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			socket.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		shouldRun = false;		
+		Disconnect();
 	}
 }
