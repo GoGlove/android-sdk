@@ -67,6 +67,14 @@ public enum GoGloveButtons {
 }
 ```
 
+Each button can have different types of actions as well, they are:
+```Java
+public enum GoGloveButtonPressType {
+    SINGLE_TAP,
+    DOUBLE_TAP
+}
+```
+
 ###Messages
 The following is the structure for event types that come from GoGlove
 ```Java
@@ -128,7 +136,7 @@ The following functions are available to connect to and control a GoGlove:
     /*!
       Allows you to specify the action for one button
     */
-	public void configureButton(GoGloveButtons button, GoGloveAction action);
+	public void configureButton(GoGloveButtons button, GoGloveButtonPressType buttonPressType, GoGloveAction action);
 
 	//! Configure Activation Timeout
     /*!

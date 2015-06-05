@@ -49,6 +49,11 @@ public class GloveSDK extends Observable {
 	    REMOTE_FIVE,
 	}
 	
+	public enum GoGloveButtonPressType {
+	    SINGLE_TAP,
+	    DOUBLE_TAP
+	}
+	
 	public enum GoGloveAction {
 	    PLAY_PAUSE, //Will send the HID Play/Paude media key
 	    NEXT_TRACK, //Will send the Next Track media key
@@ -153,7 +158,7 @@ public class GloveSDK extends Observable {
     /*!
       Allows you to specify the action for one button
     */
-	public void configureButton(GoGloveButtons button, GoGloveAction action) 
+	public void configureButton(GoGloveButtons button, GoGloveButtonPressType buttonPressType, GoGloveAction action) 
 	{
 		Message msg = new Message();
 		Bundle b = new Bundle();
