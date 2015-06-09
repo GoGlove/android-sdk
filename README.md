@@ -11,7 +11,7 @@ The Android SDK is meant to allow developers to interact with GoGlove through th
 These libraries should be added to your app "as-is", then they can be used as below.
 
 ###Instantiation
-To use the GoGlove SDK, the first step is to start the service. To do this, you must first define a ServiceManager instance.
+To use the GoGlove SDK, the first step is to start the service. To do this, you must first define a GoGloveSDK instance.
 ```Java
 import com.etu.GoGloveSDK.BLEDeviceInfoList;
 import com.etu.GoGloveSDK.GloveSDK;

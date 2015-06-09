@@ -1,13 +1,10 @@
 /**
  ******************************************************************************
  * @author  Eric Ely
- * @version V1.0.0
- * @date    15-May-2015
- * 
  * 
  * @brief   Main program body.
  ******************************************************************************
-  Copyright (c) 2013 Spark Labs, Inc.  All rights reserved.
+  Copyright (c) 2015 Easier to Use, LLC.  All rights reserved.
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation, either
