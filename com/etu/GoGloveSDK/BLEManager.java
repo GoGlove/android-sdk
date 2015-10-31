@@ -1,10 +1,13 @@
 /**
  ******************************************************************************
  * @author  Eric Ely
- *
+ * @version V1.0.0
+ * @date    15-May-2015
+ * 
+ * 
  * @brief   Main program body.
  ******************************************************************************
-  Copyright (c) 2015 Easier to Use, LLC.  All rights reserved.
+  Copyright (c) 2013 Spark Labs, Inc.  All rights reserved.
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation, either
@@ -132,12 +135,12 @@ public class BLEManager extends Observable {
     }
 		 
 	// Handles GATT events
-	boolean transmissionDone = false;
+	volatile boolean transmissionDone = false;
 	private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
-                Log.i(TAG, "Connected to Sparkle.");
+                Log.i(TAG, "Connected to GoGlove.");
                 Log.i(TAG, "Attempting to start service discovery:" +
                         mBluetoothGatt.discoverServices());
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
@@ -219,8 +222,10 @@ public class BLEManager extends Observable {
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
         	Log.d(TAG, "Found status " + status);
             if (status == BluetoothGatt.GATT_SUCCESS) {
-            	enableNotifications(UUID_PARTICLE_SERVICE, UUID_PARTICLE_RECEIVE, gatt);
-            	enableNotifications(UUID_GG_SERVICE, UUID_GG_RECEIVE, gatt);            	
+
+                enableNotifications(UUID_PARTICLE_SERVICE, UUID_PARTICLE_RECEIVE, gatt);
+                enableNotifications(UUID_GG_SERVICE, UUID_GG_RECEIVE, gatt);
+
 
                 GattEventReceived(GATTEvent.CONNECTED, null);
             } else {
@@ -249,14 +254,8 @@ public class BLEManager extends Observable {
         public void onCharacteristicWrite (BluetoothGatt gatt, 
         		BluetoothGattCharacteristic characteristic, 
         		int status) {
-        	android.util.Log.d(TAG, "  Millisecinds on event " + System.currentTimeMillis());
-        	BluetoothGattCharacteristic writeChar =
-                    mParticleBluetoothGattService.getCharacteristic(UUID_PARTICLE_SEND);        	
-        	if (writeChar == characteristic) {
-        		android.util.Log.d(TAG, "  Millisecinds success " + System.currentTimeMillis());        		
-        		transmissionDone = true;
-        	}
-        	
+            Log.d("BLEManager", "Transmission Done!");
+            transmissionDone = true;
         }
 	};
 	

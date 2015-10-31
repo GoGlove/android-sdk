@@ -1,10 +1,13 @@
 /**
  ******************************************************************************
  * @author  Eric Ely
- *
+ * @version V1.0.0
+ * @date    15-May-2015
+ * 
+ * 
  * @brief   Main program body.
  ******************************************************************************
-  Copyright (c) 2015 Easier to Use, LLC.  All rights reserved.
+  Copyright (c) 2013 Spark Labs, Inc.  All rights reserved.
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation, either
@@ -37,7 +40,6 @@ public class GloveSDK extends Observable {
 	    GLOVE_INDEX_FINGER_TIP,
 	    GLOVE_MIDDLE_FINGER_TIP,
 	    GLOVE_RING_FINGER_TIP,
-	    GLOVE_PINKY_FINGER_TIP,
 	    GLOVE_INDEX_FINGER_BASE,
 	    REMOTE_ONE,
 	    REMOTE_TWO,
@@ -58,7 +60,9 @@ public class GloveSDK extends Observable {
 	    VOLUME_UP, //Will send the Volume Up media key
 	    VOLUME_DOWN, //Will send the Volume Down media key
 	    ACTIVATE, //Will activate the glove so commands can be entered
-	    NOTIFY //Will only send the event to the registered Handler, will not send any media key
+		DEACTIVATE, //Notice that the glove is no longer active
+	    NOTIFY, //Will only send the event to the registered Handler, will not send any media key
+		PUBLISH //Will publish an event to the Spark cloud with the button number and action type
 	}
 	
     public enum GoGloveMessageType {
@@ -69,7 +73,11 @@ public class GloveSDK extends Observable {
         DISCONNECTED, //Event sent when a GoGlove is disconnected
         BUTTON_PRESS_EVENT, //Event sent when a button is pressed on a connected GoGlove
         BUTTON_CONFIGURATION, //Event that can be sent to GoGlove to change the button configuration
-        ACTIVATION_CONFIGURATION //Event that can be sent to GoGlove to change the activation timeout
+		BUTTON_QUERY, //Event that can be sent to GoGlove to poll the command of a button
+		BUTTON_QUERY_RESPONSE, //Event that comes back from GoGlove in repsonse to a BUTTON_QUERY
+        ACTIVATION_CONFIGURATION, //Event that can be sent to GoGlove to change the activation timeout
+		ID_QUERY, //Event that can be sent to GoGlove to request the Particle ID
+		ID_QUERY_RESPONSE //Event that comes back from an ID_QUERY with the Particle ID
     } 
     
     private Context context;
@@ -131,7 +139,7 @@ public class GloveSDK extends Observable {
       Connects to a specific BLE device by MAC address
     */
 	public void connect(String address) 
-	{		
+	{
 		Message msg = new Message();
 		Bundle b = new Bundle();
 		b.putInt("info", GoGloveMessageType.CONNECT.ordinal());
@@ -155,15 +163,32 @@ public class GloveSDK extends Observable {
     /*!
       Allows you to specify the action for one button
     */
-	public void configureButton(GoGloveButtons button, GoGloveButtonPressType buttonPressType, GoGloveAction action) 
+	public void configureButton(GoGloveButtons button, GoGloveButtonPressType buttonPressType, GoGloveAction action, boolean activate)
 	{
+		Log.d("GloveSDK", "Configuruing Button");
 		Message msg = new Message();
 		Bundle b = new Bundle();
 		b.putInt("info", GoGloveMessageType.BUTTON_CONFIGURATION.ordinal());
 		b.putInt("button", button.ordinal());
+		b.putInt("buttonType", buttonPressType.ordinal());
 		b.putInt("action", action.ordinal());
+		b.putBoolean("activation", activate);
 		msg.setData(b);
 		sendMessage(msg);	
+	}
+	//! Query Button
+    /*!
+      Allows you to specify the action for one button
+    */
+	public void queryButton(GoGloveButtons button, GoGloveButtonPressType buttonPressType)
+	{
+		Message msg = new Message();
+		Bundle b = new Bundle();
+		b.putInt("info", GoGloveMessageType.BUTTON_QUERY.ordinal());
+		b.putInt("button", button.ordinal());
+		b.putInt("buttonType", buttonPressType.ordinal());
+		msg.setData(b);
+		sendMessage(msg);
 	}
 	//! Configure Activation Timeout
     /*!
@@ -213,9 +238,15 @@ public class GloveSDK extends Observable {
 		                //Handle when a a button in the NOTIFY state is pressed
 		            	event.type = GoGloveMessageType.BUTTON_PRESS_EVENT;
 		            	event.contents = msg.getData();	           
-		                break;	                
-		        }
-		    	sendEvent(event);
+		                break;
+					case BUTTON_QUERY_RESPONSE:
+						Log.d("GoGlove SDK", "Handling a Button Query");
+						//Handle when a a button in the NOTIFY state is pressed
+						event.type = GoGloveMessageType.BUTTON_QUERY_RESPONSE;
+						event.contents = msg.getData();
+						break;
+				}
+				sendEvent(event);
 			} else {
 				//otherwise, it is a message from the ServiceManager
 				Log.d("GloveSelection", "Received ServiceManager Message in UI");

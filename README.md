@@ -37,17 +37,24 @@ You can now declare a new GoGloveSDK when you wish to start using the functions:
 goglove = new GloveSDK(this);
 ```
 
+When you are done using the SDK, and your Activity or instance will be closed, first unbind from the SDK:
+```Java
+goglove.unbind();
+```
+
 ###Actions
 The following actions are allowed for each button of GoGlove
 ```Java
-public enum GoGloveActions {
+public enum GoGloveAction {
     PLAY_PAUSE, //Will send the HID Play/Paude media key
     NEXT_TRACK, //Will send the Next Track media key
     PREVIOUS_TRACK, //Will send the Previous Track media key
     VOLUME_UP, //Will send the Volume Up media key
     VOLUME_DOWN, //Will send the Volume Down media key
     ACTIVATE, //Will activate the glove so commands can be entered
-    NOTIFY //Will only send the event to the registered Handler, will not send any media key
+    DEACTIVATE, //Notice that the glove is no longer active
+    NOTIFY, //Will only send the event to the registered Handler, will not send any media key
+    PUBLISH //Will publish an event to the Spark cloud with the button number and action type
 }
 ```
 ###Buttons
@@ -79,12 +86,17 @@ public enum GoGloveButtonPressType {
 The following is the structure for event types that come from GoGlove
 ```Java
 public enum GoGloveMessageType {
+    CONNECT, //Event to tell the service to connect to a specific GoGLove
+    DISCONNECT, //Event to tell the service to disconnect from a specific GoGlove
+    GET_BLE_LIST, //Get the list of all BLE devices connected
     CONNECTED, //Event sent when a GoGlove is connected
     DISCONNECTED, //Event sent when a GoGlove is disconnected
     BUTTON_PRESS_EVENT, //Event sent when a button is pressed on a connected GoGlove
     BUTTON_CONFIGURATION, //Event that can be sent to GoGlove to change the button configuration
-    ACTIVATION_CONFIGURATION //Event that can be sent to GoGlove to change the activation timeout
-}
+    BUTTON_QUERY, //Event that can be sent to GoGlove to poll the command of a button
+    BUTTON_QUERY_RESPONSE, //Event that comes back from GoGlove in repsonse to a BUTTON_QUERY
+    ACTIVATION_CONFIGURATION, //Event that can be sent to GoGlove to change the activation timeout
+} 
 ```
 
 ###Functions
